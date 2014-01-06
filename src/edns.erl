@@ -10,7 +10,8 @@
 -export([start/0, stop/0]).
 
 start() ->
-  application:start(edns).
+  application:start(edns),
+  ed_lkup_hndlr:add_handler().
 
 stop() ->
   application:stop(edns).

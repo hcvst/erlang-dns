@@ -6,8 +6,6 @@
 
 -module(ed_lkup_server).
 
--include_lib("kernel/src/inet_dns.hrl").
-
 %% API
 -export([start_link/1, init/1]).
 
@@ -29,10 +27,9 @@ init([Parent, Packet]) ->
     proc_lib:init_ack(Parent, {ok, self()}),
     answer_query(Packet).
 
-answer_query({udp, Socket, IP, Port, Bin}) ->
-   Query = inet_dns:decode(Bin),
-   io:format("State: ~p~n", [Query]),
-   gen_udp:send(Socket, IP, Port, Bin),
+answer_query({udp, Socket, IP, Port, ReqBin}) ->
+   Query = inet_dns:decode(ReqBin),
+   Resp = ed_lkup_mngr:lookup(Query), 
+   RespBin = inet_dns:encode(Resp),
+   gen_udp:send(Socket, IP, Port, RespBin),
    exit(normal).
-
-
