@@ -18,7 +18,7 @@
 
 -behaviour(ed_gen_handler).
 
--export([register/0, handle_call/1]).
+-export([register/1, handle_call/2]).
 
 -include_lib("kernel/src/inet_dns.hrl").
 
@@ -26,11 +26,11 @@
 %%% API
 %%%============================================================================
 
-register() ->
-    ed_gen_handler:register_handler(?MODULE).
+register(Context) ->
+    ed_gen_handler:register_handler(?MODULE, Context).
 
-handle_call(DnsQuery) ->
-  error_logger:info_msg("Got query: ~p~n", [DnsQuery]),
+handle_call(DnsQuery, _Context) ->
+  error_logger:info_msg("DNS query: ~p~n", [DnsQuery]),
   DnsQuery.
 
 %%%============================================================================

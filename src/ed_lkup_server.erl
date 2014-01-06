@@ -27,12 +27,7 @@ init([Parent, Packet]) ->
 
 answer_query({udp, Socket, IP, Port, ReqBin}) ->
   {ok, Query} = inet_dns:decode(ReqBin),
-  Resp = call_handlers(Query), 
+  Resp = ed_gen_handler:call_handlers(Query), 
   RespBin = inet_dns:encode(Resp),
   gen_udp:send(Socket, IP, Port, RespBin),
   exit(normal).
-
-call_handlers(Query) ->
-  Handlers = ed_registry:get_handlers(),
-  lists:foldl(fun(Handler, Acc) -> Handler:handle_call(Acc) end,
-  	Query, Handlers).

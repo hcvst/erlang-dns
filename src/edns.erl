@@ -16,7 +16,7 @@
 
 start() ->
   application:start(edns),
-  ed_log_handler:register().
+  ed_log_handler:register({}).
 
 stop() ->
   application:stop(edns).
