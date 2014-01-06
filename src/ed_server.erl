@@ -16,7 +16,6 @@
   terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
--define(DEFAULT_PORT, 1053).
 
 -record(state, {sock}).
 
@@ -37,7 +36,8 @@ start_link(UdpPort) ->
 %% @spec start_link() -> {ok, Pid::pid()}
 %% @end
 start_link() ->
-  start_link(?DEFAULT_PORT).
+  {ok, Port} = application:get_env(edns, port),
+  start_link(Port).
 
 %%-----------------------------------------------------------------------------
 %% @doc Stop the server
