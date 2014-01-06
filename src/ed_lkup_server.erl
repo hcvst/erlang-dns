@@ -6,6 +6,7 @@
 
 -module(ed_lkup_server).
 
+-include_lib("kernel/src/inet_dns.hrl").
 
 %% API
 -export([start_link/1, init/1]).
