@@ -35,6 +35,8 @@ init([]) ->
     permanent, 2000, worker, [ed_server]},
   LookupSupervisor = {ed_lkup_sup, {ed_lkup_sup, start_link, []},
     permanent, 2000, supervisor, [ed_lkup_sup]},
-  Children = [UdpServer, LookupSupervisor],
+  LookupManager = {ed_lkup_mngr, {ed_lkup_mngr, start_link, []},
+    permanent, 2000, worker, [ed_lkup_mngr]},
+  Children = [UdpServer, LookupSupervisor, LookupManager],
   RestartStrategy = {one_for_one, 3600, 4},
   {ok, {RestartStrategy, Children}}.

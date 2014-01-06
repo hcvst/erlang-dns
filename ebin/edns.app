@@ -7,13 +7,15 @@
      ed_sup, 
      ed_server,
      ed_lkup_sup,
-     ed_lkup_server
+     ed_lkup_server,
+     ed_lkup_mngr,
+     ed_lkup_hndlr
    ]},
    {registered, [ed_sup]},
    {applications, [kernel, stdlib]},
    {mod, {ed_app, []}},
    {env, [
-     {port, 1053}
+     {port, 1051}
    ]}
   ]
 }.
