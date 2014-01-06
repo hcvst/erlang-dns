@@ -8,8 +8,9 @@
      ed_server,
      ed_lkup_sup,
      ed_lkup_server,
-     ed_lkup_mngr,
-     ed_lkup_hndlr
+     ed_registry,
+     ed_gen_handler,
+     ed_log_handler
    ]},
    {registered, [ed_sup]},
    {applications, [kernel, stdlib]},

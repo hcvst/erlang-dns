@@ -9,9 +9,14 @@
 %% API
 -export([start/0, stop/0]).
 
+
+%%%============================================================================
+%%% API
+%%%============================================================================
+
 start() ->
   application:start(edns),
-  ed_lkup_hndlr:add_handler().
+  ed_log_handler:register().
 
 stop() ->
   application:stop(edns).
