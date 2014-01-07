@@ -8,3 +8,7 @@ Folks, don't use this yet. This is a first commit and will echo your DNS query b
 I am planning to use the undocumented gen_dns module to handle most of the heavy lifting. In particular gen_dns:decode/? and gen_dns:encode/? should proof handy. 
 
 This project is will morph into something useful to use with my site domain-name-registration.co.za. Positive affirmations rock!
+
+Notes
+=====
+Section 4.3.2 Algorithm in http://tools.ietf.org/html/rfc1034
