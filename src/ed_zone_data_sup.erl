@@ -9,7 +9,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0, handle/1]).
+-export([start_link/0, register_zone_provider/1]).
 
 %% behaviour callbacks
 -export([init/1]).
@@ -30,8 +30,8 @@ start_link() ->
 %%-----------------------------------------------------------------------------
 %% @doc Starts a child worker to perforom a DNS lookup 
 %%-----------------------------------------------------------------------------
-handle(UdpMsg) ->
-  supervisor:start_child(?SERVER, [UdpMsg]).
+register_zone_provider(Args) ->
+  supervisor:start_child(?SERVER, [Args]).
 
 
 %%%============================================================================

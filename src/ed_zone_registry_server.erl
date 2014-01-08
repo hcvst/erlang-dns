@@ -9,15 +9,13 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0, stop/0]).
+-export([start_link/0, register/2, deregister/1]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
   terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
-
--record(state, {sock}).
 
 %%%============================================================================
 %%% API
@@ -26,13 +24,12 @@
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-%%-----------------------------------------------------------------------------
-%% @doc Stop the server
-%% @spec stop() -> ok
-%% @end
-%%-----------------------------------------------------------------------------
-stop() ->
-  gen_server:cast(?SERVER, stop).
+register(ZoneName, Pid) ->
+  gen_server:call(?SERVER, {register, ZoneName, Pid}).
+
+
+deregister(ZoneName) ->
+  gen_server:call(?SERVER, {deregister, ZoneName}).
 
 
 %%%============================================================================
@@ -41,8 +38,24 @@ stop() ->
 
 
 init([]) ->
-  {ok, #state{}}.
+  {ok, gb_trees:empty()}.
 
+handle_call({register, ZoneName, Pid}, _From, State) ->
+  case gb_trees:is_defined(ZoneName, State) of
+  	false ->
+  	  error_logger:info_msg("Zone ~p registered.", [ZoneName]), 
+  	  {reply, ok, gb_trees:insert(ZoneName, Pid, State)};
+  	true -> 
+  	  {reply, {error, zone_already_registered}, State}
+  end;
+handle_call({deregister, ZoneName}, _From, State) ->
+  case gb_trees:is_defined(ZoneName, State) of
+  	true -> 
+  	  error_logger:info_msg("Zone ~p deregistered.", [ZoneName]),
+  	  {reply, ok, gb_trees:delete(ZoneName, State)};
+  	false -> 
+  	  {reply, {error, zone_not_registered}, State}
+  end;
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 
