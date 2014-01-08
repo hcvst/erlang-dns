@@ -4,12 +4,12 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_lkup_sup).
+-module(ed_zone_data_sup).
 
 -behaviour(supervisor).
 
 %% API
--export([start_link/0, lookup/1]).
+-export([start_link/0, handle/1]).
 
 %% behaviour callbacks
 -export([init/1]).
@@ -30,7 +30,7 @@ start_link() ->
 %%-----------------------------------------------------------------------------
 %% @doc Starts a child worker to perforom a DNS lookup 
 %%-----------------------------------------------------------------------------
-lookup(UdpMsg) ->
+handle(UdpMsg) ->
   supervisor:start_child(?SERVER, [UdpMsg]).
 
 
@@ -38,8 +38,8 @@ lookup(UdpMsg) ->
 %%% behaviour callbacks
 %%%============================================================================
 init([]) ->
-  Server = {ed_lkup_server, {ed_lkup_server, start_link, []},
-    temporary, 2000, worker, [ed_lkup_server]},
+  Server = {ed_zone_data_server, {ed_zone_data_server, start_link, []},
+    temporary, 2000, worker, [ed_zone_data_server]},
   Children = [Server],
   RestartStrategy = {simple_one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.

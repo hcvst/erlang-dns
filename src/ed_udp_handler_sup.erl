@@ -1,15 +1,15 @@
 %%%----------------------------------------------------------------------------
-%%% @doc Erlang DNS (EDNS) root supervisor
+%%% @doc Erlang DNS (EDNS) supervisor of lookup servers
 %%% @author Hans Christian v. Stockhausen <hc@vst.io>
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_sup).
+-module(ed_udp_handler_sup).
 
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, handle/1]).
 
 %% behaviour callbacks
 -export([init/1]).
@@ -27,16 +27,19 @@
 start_link() ->
   supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
+%%-----------------------------------------------------------------------------
+%% @doc Starts a child worker to perforom a DNS lookup 
+%%-----------------------------------------------------------------------------
+handle(UdpMsg) ->
+  supervisor:start_child(?SERVER, [UdpMsg]).
+
+
 %%%============================================================================
 %%% behaviour callbacks
 %%%============================================================================
 init([]) ->
-  UdpServer = {ed_udp_server, {ed_udp_server, start_link, []},
-    permanent, 2000, worker, [ed_udp_server]},
-  UdpHandlerSup = {ed_udp_handler_sup, {ed_udp_handler_sup, start_link, []},
-    permanent, 2000, supervisor, [ed_udp_handler_sup]},
-  ZoneSup = {ed_zone_sup, {ed_zone_sup, start_link, []},
-    permanent, 2000, supervisor, [ed_zone_sup]},
-  Children = [UdpServer, UdpHandlerSup, ZoneSup],
-  RestartStrategy = {one_for_one, 3600, 4},
+  Server = {ed_udp_handler_server, {ed_udp_handler_server, start_link, []},
+    temporary, 2000, worker, [ed_udp_handler_server]},
+  Children = [Server],
+  RestartStrategy = {simple_one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.

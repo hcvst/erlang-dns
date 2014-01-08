@@ -4,12 +4,12 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_server).
+-module(ed_zone_registry_server).
 
 -behaviour(gen_server).
 
 %% API
--export([start_link/0, start_link/1, stop/0]).
+-export([start_link/0, stop/0]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -23,21 +23,8 @@
 %%% API
 %%%============================================================================
 
-
-%%-----------------------------------------------------------------------------
-%% @doc Start the server
-%% @spec start_link(UdpPort::integer()) -> {ok, Pid::pid()}
-%% @end
-%%-----------------------------------------------------------------------------
-start_link(UdpPort) ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [UdpPort], []).
-
-%% @doc Start the server on default port
-%% @spec start_link() -> {ok, Pid::pid()}
-%% @end
 start_link() ->
-  {ok, Port} = application:get_env(edns, port),
-  start_link(Port).
+  gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 %%-----------------------------------------------------------------------------
 %% @doc Stop the server
@@ -53,9 +40,8 @@ stop() ->
 %%%============================================================================
 
 
-init([UdpPort]) ->
-  {ok, Sock} = gen_udp:open(UdpPort, [{active, true}, binary]),
-  {ok, #state{sock=Sock}}.
+init([]) ->
+  {ok, #state{}}.
 
 handle_call(_Request, _From, State) ->
   {noreply, State}.
@@ -63,12 +49,10 @@ handle_call(_Request, _From, State) ->
 handle_cast(stop, State) ->
   {stop, normal, State}.
 
-handle_info(UdpMsg, State) ->
-   ed_lkup_sup:lookup(UdpMsg),
+handle_info(_Info, State) ->
    {noreply, State}.
 
-terminate(_Reason, #state{sock = Sock}) ->
-  gen_udp:close(Sock),
+terminate(_Reason, _State) ->
   ok.
 
 code_change(_OldVsn, State, _Extra) ->

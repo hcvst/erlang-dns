@@ -4,7 +4,7 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_sup).
+-module(ed_zone_sup).
 
 -behaviour(supervisor).
 
@@ -31,12 +31,12 @@ start_link() ->
 %%% behaviour callbacks
 %%%============================================================================
 init([]) ->
-  UdpServer = {ed_udp_server, {ed_udp_server, start_link, []},
-    permanent, 2000, worker, [ed_udp_server]},
-  UdpHandlerSup = {ed_udp_handler_sup, {ed_udp_handler_sup, start_link, []},
-    permanent, 2000, supervisor, [ed_udp_handler_sup]},
-  ZoneSup = {ed_zone_sup, {ed_zone_sup, start_link, []},
-    permanent, 2000, supervisor, [ed_zone_sup]},
-  Children = [UdpServer, UdpHandlerSup, ZoneSup],
+  ZoneRegistryServer = {ed_zone_registry_server, 
+    {ed_zone_registry_server, start_link, []},
+    permanent, 2000, worker, [ed_zone_registry_server]},
+  ZoneDataSup = {ed_zone_data_sup,
+    {ed_zone_data_sup, start_link, []},
+    permanent, 2000, supervisor, [ed_zone_data_sup]},
+  Children = [ZoneRegistryServer, ZoneDataSup],
   RestartStrategy = {one_for_one, 3600, 4},
   {ok, {RestartStrategy, Children}}.

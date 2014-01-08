@@ -7,7 +7,7 @@
 -module(edns).
 
 %% API
--export([start/0, stop/0]).
+-export([start/0, stop/0, register_zone_provider/1]).
 
 
 %%%============================================================================
@@ -15,8 +15,10 @@
 %%%============================================================================
 
 start() ->
-  application:start(edns),
-  ed_log_handler:register({}).
+  application:start(edns).
 
 stop() ->
   application:stop(edns).
+
+register_zone_provider(_Args) ->
+  notimplemented.
