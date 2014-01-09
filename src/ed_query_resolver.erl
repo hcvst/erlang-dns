@@ -34,7 +34,9 @@ load_zone(Q, Zone) ->
 match_records(Q, RRTree) ->
     DomainName = get_domain_name(Q),
     case gb_trees:is_defined(DomainName, RRTree) of
-    	true -> Q; %% next here
+    	true -> 
+    	    RRs = gb_trees:get(DomainName, RRTree),
+    	    Q#dns_rec{anlist=RRs}; %% @FIXME continue flow here
     	false -> non_existent_domain(Q, RRTree) 
     end.
 
@@ -51,7 +53,7 @@ non_existent_zone(Q) ->
     set_response_code(Q, ?NXDOMAIN).
 
 non_existent_domain(Q, _RRTree) ->
-    %% FIXME: insert SOA
+    %% @Todo insert SOA
     set_response_code(Q, ?NXDOMAIN).
 
 set_recursion_available(Q, Available) ->
