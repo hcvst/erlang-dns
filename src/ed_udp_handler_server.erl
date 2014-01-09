@@ -27,7 +27,7 @@ init([Parent, Packet]) ->
 
 answer_query({udp, Socket, IP, Port, ReqBin}) ->
   {ok, Query} = inet_dns:decode(ReqBin),
-  Resp = Query, 
+  Resp = ed_query_resolver:resolve(Query), 
   RespBin = inet_dns:encode(Resp),
   gen_udp:send(Socket, IP, Port, RespBin),
   exit(normal).

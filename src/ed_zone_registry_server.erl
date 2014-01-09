@@ -9,7 +9,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0, register/2, deregister/1]).
+-export([start_link/0, register/2, deregister/1, get/1, find_nearest_zone/1]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -27,9 +27,14 @@ start_link() ->
 register(ZoneName, Pid) ->
   gen_server:call(?SERVER, {register, ZoneName, Pid}).
 
-
 deregister(ZoneName) ->
   gen_server:call(?SERVER, {deregister, ZoneName}).
+
+get(ZoneName) ->
+  gen_server:call(?SERVER, {get, ZoneName}).
+
+find_nearest_zone(DomainName) ->
+  gen_server:call(?SERVER, {find_nearest_zone, DomainName}).
 
 
 %%%============================================================================
@@ -56,6 +61,22 @@ handle_call({deregister, ZoneName}, _From, State) ->
   	false -> 
   	  {reply, {error, zone_not_registered}, State}
   end;
+handle_call({get, ZoneName}, _From, State) -> 
+  case gb_trees:is_defined(ZoneName, State) of
+  	true -> 
+  	  {reply, {ok, gb_trees:get(ZoneName,State)}, State};
+  	false -> 
+  	  {reply, {error, zone_not_registered}, State}
+  end;
+handle_call({find_nearest_zone, DomainName}, _From, State) ->
+  NameTails = ed_utils:tails(string:tokens(DomainName, ".")),
+  Names = lists:map(fun(X) -> string:join(X, ".") end, NameTails),
+  IsZoneNotDefined = fun(Z) -> not gb_trees:is_defined(Z, State) end,
+  Zone = case lists:dropwhile(IsZoneNotDefined, Names) of
+  	[] -> {error, zone_not_found};
+  	[H|_] -> {ok, gb_trees:get(H, State)}
+  end,
+  {reply, Zone, State};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 

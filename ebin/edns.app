@@ -13,7 +13,9 @@
      ed_zone_data_sup,
      ed_zone_data_server,
      ed_zone_provider,
-     dummy_backend
+     ed_query_resolver,
+     dummy_backend,
+     ed_utils
    ]},
    {registered, [ed_sup]},
    {applications, [kernel, stdlib]},

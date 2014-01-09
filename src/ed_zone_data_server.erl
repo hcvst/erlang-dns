@@ -9,7 +9,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/1]).
+-export([start_link/1, get_zone/1]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -26,6 +26,9 @@
 start_link(Args) ->
   gen_server:start_link(?MODULE, [Args], []).
 
+get_zone(Pid) ->
+  gen_server:call(Pid, get_zone).
+
 %%%============================================================================
 %%% behaviour callbacks
 %%%============================================================================
@@ -37,6 +40,9 @@ init([{ZoneName, ZoneProvider}]) ->
     {error, Reason} -> {stop, Reason}
   end.
 
+
+handle_call(get_zone, _From, State) ->
+  {reply, {ok, State#state.rr_tree}, State};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 

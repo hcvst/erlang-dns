@@ -7,7 +7,7 @@
 -module(edns).
 
 %% API
--export([start/0, stop/0, register_zone_provider/2]).
+-export([start/0, stop/0, register_zone_provider/2, flush_zone/1]).
 
 
 %%%============================================================================
@@ -22,3 +22,9 @@ stop() ->
 
 register_zone_provider(ZoneName, Handler={_Module, _Function, _Context}) ->
   ed_zone_data_sup:register_zone_provider({ZoneName, Handler}).
+
+flush_zone(ZoneName) ->
+  {ok, Pid} = ed_zone_registry_server:get(ZoneName),
+  Pid ! timeout,
+  ok.
+
