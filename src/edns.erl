@@ -15,7 +15,8 @@
 %%%============================================================================
 
 start() ->
-  application:start(edns).
+  application:start(edns),
+  register_zone_provider("abc.com", {dummy_backend, get_zone, "Hello DNS"}).
 
 stop() ->
   application:stop(edns).

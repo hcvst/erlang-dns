@@ -17,7 +17,7 @@ resolve(Q) ->
     %} = Q1,
     case length(Q1#dns_rec.qdlist) of
     	1 -> find_zone(Q1);
-    	_ -> not_implemented_error(Q1, multiple_queries)
+    	_ -> not_implemented_error(Q1, multiple_questions)
     end.
 
 find_zone(Q) -> 
