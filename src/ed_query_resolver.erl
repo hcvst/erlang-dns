@@ -70,11 +70,26 @@ process_qname_match(Q, RRTree, DomainName, Type) ->
     	    matching_rr_to_anlist(Q, RRs, Type)
     end.
 
-resolve_cname(Q, _RR) ->
-    Q. % TODO
+resolve_cname(Q, RR) ->
+    % ...copy the CNAME RR into the answer section
+    % of the response, change QNAME to the canonical name in
+    % the CNAME RR, and go back to step 1.
+    [QD|[]] = Q#dns_rec.qdlist,
+    AnList = Q#dns_rec.anlist,
+    CName = RR#dns_rr.data,
+    Q1 = Q#dns_rec{
+        qdlist=[QD#dns_query{domain=CName}],
+        anlist=[RR|AnList]
+    },
+    Q2 = resolve(Q1),
+    Q2#dns_rec{qdlist=Q#dns_rec.qdlist}.
 
-matching_rr_to_anlist(Q, _RRs, _Type) ->
-    Q. % TODO
+matching_rr_to_anlist(Q, RRs, Type) ->
+    MatchingRRs = lists:filter(
+    	fun(RR) -> RR#dns_rr.type =:= Type end
+    	, RRs),
+    AnList = Q#dns_rec.anlist,	
+    Q#dns_rec{anlist=AnList++MatchingRRs}.
 
 is_referral_match() ->
     true. % TODO
