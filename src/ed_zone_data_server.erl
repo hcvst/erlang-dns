@@ -9,7 +9,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/1, get_zone/1]).
+-export([start_link/1, get_zone/1, flush/1]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -29,6 +29,9 @@ start_link(Args) ->
 get_zone(Pid) ->
   gen_server:call(Pid, get_zone).
 
+flush(Pid) -> 
+  gen_server:cast(Pid, flush).
+
 %%%============================================================================
 %%% behaviour callbacks
 %%%============================================================================
@@ -46,6 +49,8 @@ handle_call(get_zone, _From, State) ->
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 
+handle_cast(flush, State) ->
+  {noreply, State, 0}; %% triggers handle_info(timeout, ...
 handle_cast(stop, State) ->
   {stop, normal, State}.
 
@@ -62,7 +67,7 @@ handle_info(timeout, #state{zone_provider={M,F,A}}=State) ->
           gb_trees:update(Domain, [RR|gb_trees:get(Domain, Tree)], Tree)
        end 
     end, gb_trees:empty(), RRs),
-   {noreply, State#state{rr_tree=RRTree}, 60000};
+   {noreply, State#state{rr_tree=RRTree}, 60000}; %% FIXME timeout
 handle_info(_Info, State) ->
    {noreply, State}.
 

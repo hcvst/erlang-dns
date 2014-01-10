@@ -25,7 +25,6 @@ register_zone_provider(ZoneName, Handler={_Module, _Function, _Context}) ->
   ed_zone_data_sup:register_zone_provider({ZoneName, Handler}).
 
 flush_zone(ZoneName) ->
-  {ok, Pid} = ed_zone_registry_server:get(ZoneName),
-  Pid ! timeout,
-  ok.
+  {ok, Zone} = ed_zone_registry_server:get(ZoneName),
+  ed_zone_data_server:flush(Zone).
 

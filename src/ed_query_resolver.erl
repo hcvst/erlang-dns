@@ -1,20 +1,21 @@
 -module(ed_query_resolver).
-
+%% also see http://bind10.isc.org/wiki/AuthServerQueryLogic
+%% API
 -export([resolve/1]).
 
 -include_lib("kernel/src/inet_dns.hrl").
 
+-define(AUTHORATIVE_ANSWER, 1).
 -define(NO_RECURSION, 0).
+
+
+
+%%%============================================================================
+%%% Server Algorithm - see RFC1034
+%%%============================================================================
 
 resolve(Q) ->
     Q1 = set_recursion_available(Q, ?NO_RECURSION),
-    %#dns_rec{
-	%   header = _Header, %% dns_header record
-	%   qdlist = _QDs,    %% list of question entries
-	%   anlist = _ANs,    %% list of answer entries
-	%   nslist = _NSs,    %% list of authority entries
-	%   arlist = _ARs     %% list of resource entries
-    %} = Q1,
     case length(Q1#dns_rec.qdlist) of
     	1 -> find_zone(Q1);
     	_ -> not_implemented_error(Q1, multiple_questions)
@@ -28,21 +29,64 @@ find_zone(Q) ->
     end.
 
 load_zone(Q, Zone) ->
+    Q1 = set_aa_header_flag(Q),
     {ok, RRTree} = ed_zone_data_server:get_zone(Zone),
-    match_records(Q, RRTree).
+    match_records(Q1, RRTree).
 
 match_records(Q, RRTree) ->
-    DomainName = get_domain_name(Q),
-    case gb_trees:is_defined(DomainName, RRTree) of
-    	true -> 
-    	    RRs = gb_trees:get(DomainName, RRTree),
-    	    Q#dns_rec{anlist=RRs}; %% @FIXME continue flow here
-    	false -> non_existent_domain(Q, RRTree) 
+    DomainName = get_domain_name(Q),  
+    NameTails = ed_utils:tails(string:tokens(DomainName, ".")),
+    Names = lists:map(fun(X) -> string:join(X, ".") end, NameTails),
+    match_records(Q, RRTree, Names).
+
+match_records(Q, RRTree, []) ->
+    non_existent_domain(Q, RRTree);
+match_records(Q, RRTree, [Name|Rest]) ->
+    [#dns_query{domain=D, type=T, class=_C}|[]] = Q#dns_rec.qdlist,
+    case is_qname_match(RRTree, Name, D) of
+    	true ->  process_qname_match(Q, RRTree, D, T);
+    	false ->
+    	    case is_referral_match() of
+    	    	true -> process_referral_match(Q, RRTree, D, T);
+    	    	false ->
+    	    	    case is_wildcard_match() of
+    	    	        true -> process_wildcard_match(Q, RRTree, D, T);
+    	    	        false ->
+    	    	            match_records(Q, RRTree, Rest)
+    	    	    end
+    	    end
     end.
 
-get_domain_name(Q) ->
-    [QD|[]] = Q#dns_rec.qdlist,
-    QD#dns_query.domain.
+is_qname_match(RRTree, DomainName, DomainName) ->
+    gb_trees:is_defined(DomainName, RRTree);
+is_qname_match(_RRTree, _DomainName, _OtherDomainName) ->
+    false.
+
+process_qname_match(Q, RRTree, DomainName, Type) ->
+    case gb_trees:get(DomainName, RRTree) of
+    	[RR|[]] when RR#dns_rr.type=:=cname andalso Type=/=cname ->
+    	    resolve_cname(Q, RR);
+    	RRs ->
+    	    matching_rr_to_anlist(Q, RRs, Type)
+    end.
+
+resolve_cname(Q, _RR) ->
+    Q. % TODO
+
+matching_rr_to_anlist(Q, _RRs, _Type) ->
+    Q. % TODO
+
+is_referral_match() ->
+    true. % TODO
+
+process_referral_match(Q, _RRTree, _D, _T) ->
+    Q. % TODO
+
+is_wildcard_match() ->
+    true. % TODO
+
+process_wildcard_match(Q, _RRTree, _D, _T) ->
+    Q. % TODO  
 
 not_implemented_error(Q, Reason) ->
     error_logger:error_msg("Not implemented (~p) Query: ~p", [Reason, Q]),
@@ -50,14 +94,38 @@ not_implemented_error(Q, Reason) ->
 
 non_existent_zone(Q) ->
     error_logger:info_msg("Zone not found for Query: ~p", [Q]),
-    set_response_code(Q, ?NXDOMAIN).
+    case is_cname_recursive_lookup(Q) of
+    	true  -> set_response_code(Q, ?NOERROR);
+    	false -> set_response_code(Q, ?REFUSED)
+    end.
 
 non_existent_domain(Q, _RRTree) ->
     %% @Todo insert SOA
     set_response_code(Q, ?NXDOMAIN).
 
+%%%============================================================================
+%%% Helpers
+%%%============================================================================
+
+is_cname_recursive_lookup(Q) ->
+    % If we invoked resolve/1 recursively to resolve a CNAME reference then
+    % the answer section should already contain exactly one CNAME RR and
+    % none otherwise. See rfc1034 section 4.3.2.3.a.
+    case Q#dns_rec.anlist of
+    	[RR|[]] when RR#dns_rr.type=:=cname -> true;
+    	[] -> false
+    end.
+
+get_domain_name(Q) ->
+    [QD|[]] = Q#dns_rec.qdlist,
+    QD#dns_query.domain.
+
 set_recursion_available(Q, Available) ->
     Header = Q#dns_rec.header#dns_header{ra=Available},
+    set_header(Q, Header).
+
+set_aa_header_flag(Q) ->
+    Header = Q#dns_rec.header#dns_header{aa=?AUTHORATIVE_ANSWER},
     set_header(Q, Header).
 
 set_response_code(Q, Code) ->
