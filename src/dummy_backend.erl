@@ -12,7 +12,10 @@ get_zone(Ctx) ->
     #dns_rr{domain="www.abc.com", type=cname, data="www2.abc.com"},
     #dns_rr{domain="www2.abc.com", type=cname, data="abc.com"},
     #dns_rr{domain="abc.com", type=a, data={1,2,3,4}},
-    #dns_rr{domain="abc.com", type=a, data={5,6,7,8}}
+    #dns_rr{domain="abc.com", type=a, data={5,6,7,8}},
+    #dns_rr{domain="sub.abc.com", type=ns, data="ns1.sub.abc.com"},
+    #dns_rr{domain="sub.abc.com", type=ns, data="ns2.sub.abc.com"},
+    #dns_rr{domain="ns2.sub.abc.com", type=a, data={127,0,0,1}}
   ]}.
 
   %% Use it: edns:register_zone_provider(ZoneNname, {dummy_backend, get_zone, some_context}).
