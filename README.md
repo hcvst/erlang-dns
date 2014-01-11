@@ -27,7 +27,7 @@ get_zone(_Args) ->
     %% Fetch the Zone from a file, the DB, ...
     %% Here we just hardcode it
     {ok, [                                     
-        #dns_rr{domain="", type=soa, data={   
+        #dns_rr{domain="bot.co.za", type=soa, data={   
             "ns1.bot.co.za",                         
             "hc.vst.io",              
             870611,          %serial
