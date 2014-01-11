@@ -26,7 +26,7 @@ main(_) ->
     ok = test_rfc1034_6_2_6(),
     ok = test_rfc1034_6_2_7(),
     ok = test_rfc1034_6_2_8(),
-    io:format("~n~nEDNS END2END TESTS - All tests passed.~n"),
+    log("ALL TESTS PASSED"),
     ok.
 
 test_rfc1034_6_2_1() -> %% http://tools.ietf.org/html/rfc1034#section-6.2.1
@@ -36,6 +36,7 @@ test_rfc1034_6_2_1() -> %% http://tools.ietf.org/html/rfc1034#section-6.2.1
     [SriA1,SriA2] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_1 passed"),
     ok.
 
 test_rfc1034_6_2_2() ->
@@ -45,6 +46,7 @@ test_rfc1034_6_2_2() ->
     [SriA1, SriA2, SriMx, SriHi] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_2 passed"),
     ok.
 
 test_rfc1034_6_2_3() ->
@@ -54,6 +56,7 @@ test_rfc1034_6_2_3() ->
     [SriMx] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [SriA1, SriA2] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_3 passed"),
     ok.
 
 test_rfc1034_6_2_4() ->
@@ -63,12 +66,14 @@ test_rfc1034_6_2_4() ->
     [] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_4 passed"),
     ok.
 
 test_rfc1034_6_2_5() ->
     ?SAMPLE_ROOT_ZONE,
     {error, nxdomain} = inet_res:nslookup("SIR-NIC.ARPA", in, a, 
         ?DNS_SERVERS),
+    log("test_rfc1034_6_2_5 passed"),
     ok.
 
 test_rfc1034_6_2_6() ->
@@ -78,6 +83,7 @@ test_rfc1034_6_2_6() ->
     [] = inet_dns:msg(Msg, anlist),
     [MilNs1, MilNs2] = inet_dns:msg(Msg, nslist),
     [SriA1, SriA2, AIsiA1] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_6 passed"),
     ok.
 
 test_rfc1034_6_2_7() ->
@@ -87,6 +93,7 @@ test_rfc1034_6_2_7() ->
     [UscCname, CIsiA1] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_7 passed"),
     ok.
 
 test_rfc1034_6_2_8() ->
@@ -96,4 +103,8 @@ test_rfc1034_6_2_8() ->
     [UscCname] = inet_dns:msg(Msg, anlist),
     [] = inet_dns:msg(Msg, nslist),
     [] = inet_dns:msg(Msg, arlist),
+    log("test_rfc1034_6_2_8 passed"),
     ok.
+
+log(Msg) ->
+    io:format("EDNS e2e tests: ~s ~n", [Msg]).
