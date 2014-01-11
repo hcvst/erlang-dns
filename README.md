@@ -11,9 +11,9 @@ arbitrary Zones via simple Erlang modules. It's up to you whether the
 Zone is defined in some file or a DB for example. As long as it returns
 a zone as a list of resource records EDNS can serve it up.
 
-Current Release
+Release Hisotry
 ===============
-v0.1-alpha
+* 2014-01-11 `v0.1-alpha` - First version that conforms to RFC1034 examples
 
 Example
 =======
