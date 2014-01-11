@@ -56,7 +56,7 @@ edns:register_zone_provider("bot.co.za", {my_zone_provider, get_zone, []}).
 If you change and recompile `my_zone_provider` you can flush the zone with
 
 ```
-ends:flush("bot.co.za").
+edns:flush("bot.co.za").
 ```
 
 without restarting the server.
