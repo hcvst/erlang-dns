@@ -279,9 +279,9 @@ non_existent_zone(Q) ->
     end.
 
 non_existent_domain(Q, RRTree) ->
-    error_logger:info_msg("NXDOMAIN for Query: ~p", [Q]),
     SoaRR = get_soa_rr(RRTree),
     Q1 = Q#dns_rec{nslist=[SoaRR|Q#dns_rec.nslist]},
+    error_logger:info_msg("NXDOMAIN response: ~p", [Q1]),
     set_response_code(Q1, ?NXDOMAIN).
 
 %%%============================================================================
