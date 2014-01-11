@@ -53,8 +53,16 @@ provider.
 edns:register_zone_provider("bot.co.za", {my_zone_provider, get_zone, []}).
 ```
 
+If you change and recompile `my_zone_provider` you can flush the zone with
+
+```
+ends:flush("bot.co.za").
+```
+
+without restarting the server.
+
 Also, please have a look at the-end-to end test scenario for an example of 
-how to setup the included `simple_backend` zone provider module.
+how to setup the included `src/simple_backend.erl` zone provider module.
 
 Tests
 =====
