@@ -17,9 +17,45 @@ v0.1-alpha
 
 Example
 =======
-Have a look at the end to end test scenario for an example of how to setup
-a zone provider module.
 
+```
+-module(my_zone_provider).
+
+-export([get_zone/1]).
+
+get_zone(_Args) ->
+    %% Fetch the Zone from a file, the DB, ...
+    %% Here we just hardcode it
+    {ok, [                                     
+        #dns_rr{domain="", type=soa, data={   
+            "ns1.bot.co.za",                         
+            "hc.vst.io",              
+            870611,          %serial
+            1800,            %refresh every 30 min 
+            300,             %retry every 5 min
+            604800,          %expire after a week
+            86400            %minimum of a day
+            }
+        },
+        #dns_rr{domain="bot.co.za", type=ns, data="ns1.bot.co.za"},
+        #dns_rr{domain="bot.co.za", type=ns, data="ns2.bot.co.za"},
+        #dns_rr{domain="www.bot.co.za", type=cname, data="bot.co.za"},
+        #dns_rr{domain="bot.co.za", type=a, data={127,0,0,1}}
+    ]}.
+```
+
+Then, bring up the server with `erl -pa ./ebin -s edns` and register your zone 
+provider.
+
+```
+edns:register_zone_provider("bot.co.za", {my_zone_provider, get_zone, []}).
+```
+
+Also, please have a look at the-end-to end test scenario for an example of 
+how to setup the included `simple_backend` zone provider module.
+
+Tests
+=====
 To run the end to end test executed `make e2e`.
 
 System Architecture
