@@ -49,7 +49,7 @@ get_zone(_Args) ->
 Then, bring up the server with `erl -pa ./ebin -s edns` and register your zone 
 provider.
 
-```
+```erlang
 edns:register_zone_provider("bot.co.za", {my_zone_provider, get_zone, []}).
 ```
 
