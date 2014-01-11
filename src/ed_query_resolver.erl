@@ -83,8 +83,9 @@
 
 -include_lib("kernel/src/inet_dns.hrl").
 
--define(AUTHORATIVE_ANSWER, 1).
--define(NO_RECURSION, 0).
+-define(AUTHORATIVE_ANSWER_FLAG, 1).
+-define(RESPONSE_FLAG, 1).
+-define(NO_RECURSION_FLAG, 0).
 
 
 %%%============================================================================
@@ -92,9 +93,10 @@
 %%%============================================================================
 
 resolve(Q) ->
-    Q1 = set_recursion_available(Q, ?NO_RECURSION),
-    case length(Q1#dns_rec.qdlist) of
-    	1 -> find_zone(Q1);
+    Q1 = set_recursion_available(Q, ?NO_RECURSION_FLAG),
+    Q2 = set_response_flag(Q1),
+    case length(Q2#dns_rec.qdlist) of
+    	1 -> find_zone(Q2);
     	_ -> not_implemented_error(Q1, multiple_questions)
     end.
 
@@ -271,8 +273,12 @@ set_recursion_available(Q, Available) ->
     Header = Q#dns_rec.header#dns_header{ra=Available},
     set_header(Q, Header).
 
+set_response_flag(Q) ->
+    Header = Q#dns_rec.header#dns_header{qr=?RESPONSE_FLAG},
+    set_header(Q, Header).
+
 set_aa_header_flag(Q) ->
-    Header = Q#dns_rec.header#dns_header{aa=?AUTHORATIVE_ANSWER},
+    Header = Q#dns_rec.header#dns_header{aa=?AUTHORATIVE_ANSWER_FLAG},
     set_header(Q, Header).
 
 set_response_code(Q, Code) ->

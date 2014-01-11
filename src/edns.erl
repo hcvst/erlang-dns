@@ -16,7 +16,7 @@
 
 start() ->
   application:start(edns),
-  register_zone_provider("abc.com", {dummy_backend, get_zone, "Hello DNS"}).
+  register_zone_provider("", {dummy_backend, get_zone, root_zone}).
 
 stop() ->
   application:stop(edns).
