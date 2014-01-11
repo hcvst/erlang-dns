@@ -23,6 +23,8 @@ Example
 
 -export([get_zone/1]).
 
+-include_lib("kernel/src/inet_dns.hrl").
+
 get_zone(_Args) ->
     %% Fetch the Zone from a file, the DB, ...
     %% Here we just hardcode it
