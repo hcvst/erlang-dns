@@ -12,9 +12,8 @@
      ed_zone_registry_server,
      ed_zone_data_sup,
      ed_zone_data_server,
-     ed_zone_provider,
      ed_query_resolver,
-     dummy_backend,
+     simple_backend,
      ed_utils,
      dummy_parked_backend,
      ed_zone_validator

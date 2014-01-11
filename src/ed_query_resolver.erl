@@ -1,3 +1,5 @@
+%% TOD - Use inet_dbs_record_adts.hrl helpers
+
 %%% 4.3.2. Algorithm
 %%% 
 %%% The actual algorithm used by the name server will depend on the local OS
@@ -236,17 +238,20 @@ process_wildcard_match(Q, RRTree, DomainName, Type) ->
 
 
 enrich_additional_section(Q, RRTree) ->
+    [QD|[]] = Q#dns_rec.qdlist,
     AnList = Q#dns_rec.anlist,
     ArList = lists:foldr(
     	fun(RR, Acc) -> 
     		case RR#dns_rr.type of
-    			mx -> enrich_additional_section_mx(RRTree, RR, Acc);
+    			mx -> enrich_additional_section_mx(RRTree, RR, Acc, QD);
     			_  -> Acc
     		end
     	end, Q#dns_rec.arlist, AnList),
     Q#dns_rec{arlist=ArList}.
 
-enrich_additional_section_mx(RRTree, MxRR, ArList) ->
+enrich_additional_section_mx(_RRTree, _MxRR, ArList, #dns_query{type=any}) ->
+    ArList;  %% don't enrich for ANY queries
+enrich_additional_section_mx(RRTree, MxRR, ArList, QD) ->
     {_Prio, DomainName} = MxRR#dns_rr.data,
     case gb_trees:lookup(DomainName, RRTree) of
     	none -> ArList;

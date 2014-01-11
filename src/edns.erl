@@ -15,8 +15,7 @@
 %%%============================================================================
 
 start() ->
-  application:start(edns),
-  register_zone_provider("", {dummy_backend, get_zone, root_zone}).
+  application:start(edns).
 
 stop() ->
   application:stop(edns).
