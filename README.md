@@ -18,7 +18,7 @@ v0.1-alpha
 Example
 =======
 
-```
+```erlang
 -module(my_zone_provider).
 
 -export([get_zone/1]).
