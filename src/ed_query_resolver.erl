@@ -203,7 +203,7 @@ resolve_cname(Q, RR) ->
 
 matching_rr_to_anlist(Q, RRs, Type) ->
     MatchingRRs = lists:filter(
-    	fun(RR) -> RR#dns_rr.type =:= Type end
+    	fun(RR) -> (RR#dns_rr.type =:= Type) or (Type =:= any) end
     	, RRs),
     AnList = Q#dns_rec.anlist,	
     Q#dns_rec{anlist=AnList++MatchingRRs}.
