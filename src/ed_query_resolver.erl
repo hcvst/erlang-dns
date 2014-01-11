@@ -240,9 +240,10 @@ non_existent_zone(Q) ->
     	false -> set_response_code(Q, ?REFUSED)
     end.
 
-non_existent_domain(Q, _RRTree) ->
-    %% @Todo insert SOA
-    set_response_code(Q, ?NXDOMAIN).
+non_existent_domain(Q, RRTree) ->
+    SoaRR = get_soa_rr(RRTree),
+    Q1 = Q#dns_rec{nslist=[SoaRR|Q#dns_rec.nslist]},
+    set_response_code(Q1, ?NXDOMAIN).
 
 %%%============================================================================
 %%% Helpers
