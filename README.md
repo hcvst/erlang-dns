@@ -8,7 +8,7 @@ http://www.domain-name-registration.co.za.
 
 The idea is to have a simple DNS server that can be configured with 
 arbitrary Zones via simple Erlang modules. It's up to you whether the
-Zone is defined in some file or a DB for example. As long as it returns
+Zone is defined in some file or a DB for example. As long as the module returns
 a zone as a list of resource records EDNS can serve it up.
 
 Releases
