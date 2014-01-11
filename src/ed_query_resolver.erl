@@ -272,13 +272,14 @@ not_implemented_error(Q, Reason) ->
     set_response_code(Q, ?NOTIMP).
 
 non_existent_zone(Q) ->
-    error_logger:info_msg("Zone not found for Query: ~p", [Q]),
+    error_logger:warning_msg("Zone not found for Query: ~p", [Q]),
     case is_cname_recursive_lookup(Q) of
     	true  -> set_response_code(Q, ?NOERROR);
     	false -> set_response_code(Q, ?REFUSED)
     end.
 
 non_existent_domain(Q, RRTree) ->
+    error_logger:info_msg("NXDOMAIN for Query: ~p", [Q]),
     SoaRR = get_soa_rr(RRTree),
     Q1 = Q#dns_rec{nslist=[SoaRR|Q#dns_rec.nslist]},
     set_response_code(Q1, ?NXDOMAIN).
