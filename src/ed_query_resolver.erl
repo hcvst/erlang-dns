@@ -84,6 +84,7 @@
 -include_lib("kernel/src/inet_dns.hrl").
 
 -define(AUTHORATIVE_ANSWER_FLAG, 1).
+-define(NOT_AUTHORATIVE_ANSWER_FLAG, 0).
 -define(RESPONSE_FLAG, 1).
 -define(NO_RECURSION_FLAG, 0).
 
@@ -172,7 +173,10 @@ process_referral_match(Q, RRTree, DomainName) ->
     	    end 
     	end 
     	, [], NsRRs),
-    Q#dns_rec{nslist=NsList++NsRRs, arlist=ArList++GlueRRs}.
+    Q1 = Q#dns_rec{nslist=NsList++NsRRs, arlist=ArList++GlueRRs},
+    clear_aa_header_flag(Q1).
+    
+
 
 is_qname_match(RRTree, DomainName, DomainName) ->
     gb_trees:is_defined(DomainName, RRTree);
@@ -280,6 +284,10 @@ set_response_flag(Q) ->
 
 set_aa_header_flag(Q) ->
     Header = Q#dns_rec.header#dns_header{aa=?AUTHORATIVE_ANSWER_FLAG},
+    set_header(Q, Header).
+
+clear_aa_header_flag(Q) ->
+    Header = Q#dns_rec.header#dns_header{aa=?NOT_AUTHORATIVE_ANSWER_FLAG},
     set_header(Q, Header).
 
 set_response_code(Q, Code) ->
