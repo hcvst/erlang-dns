@@ -126,47 +126,13 @@ match_records(Q, RRTree, [Name|Rest]) ->
     	    case is_qname_match(RRTree, Name, D) of
     	    	true -> process_qname_match(Q, RRTree, Name, T);
     	    	false ->
-    	    	    case is_wildcard_match() of
+    	    	    case is_wildcard_match(RRTree, Name) of
     	    	        true -> process_wildcard_match(Q, RRTree, Name, T);
     	    	        false ->
     	    	            match_records(Q, RRTree, Rest)
     	    	    end
     	    end
     end.
-
-is_qname_match(RRTree, DomainName, DomainName) ->
-    gb_trees:is_defined(DomainName, RRTree);
-is_qname_match(_RRTree, _DomainName, _OtherDomainName) ->
-    false.
-
-process_qname_match(Q, RRTree, DomainName, Type) ->
-    case gb_trees:get(DomainName, RRTree) of
-    	[RR|[]] when RR#dns_rr.type=:=cname andalso Type=/=cname ->
-    	    resolve_cname(Q, RR);
-    	RRs ->
-    	    matching_rr_to_anlist(Q, RRs, Type)
-    end.
-
-resolve_cname(Q, RR) ->
-    % ...copy the CNAME RR into the answer section
-    % of the response, change QNAME to the canonical name in
-    % the CNAME RR, and go back to step 1.
-    [QD|[]] = Q#dns_rec.qdlist,
-    AnList = Q#dns_rec.anlist,
-    CName = RR#dns_rr.data,
-    Q1 = Q#dns_rec{
-        qdlist=[QD#dns_query{domain=CName}],
-        anlist=[RR|AnList]
-    },
-    Q2 = resolve(Q1),
-    Q2#dns_rec{qdlist=Q#dns_rec.qdlist}.
-
-matching_rr_to_anlist(Q, RRs, Type) ->
-    MatchingRRs = lists:filter(
-    	fun(RR) -> RR#dns_rr.type =:= Type end
-    	, RRs),
-    AnList = Q#dns_rec.anlist,	
-    Q#dns_rec{anlist=AnList++MatchingRRs}.
 
 is_referral_match(RRTree, DomainName) ->
     % ... If a match would take us out of the authoritative data,
@@ -206,11 +172,60 @@ process_referral_match(Q, RRTree, DomainName) ->
     	, [], NsRRs),
     Q#dns_rec{nslist=NsList++NsRRs, arlist=ArList++GlueRRs}.
 
-is_wildcard_match() ->
-    false. % TODO
+is_qname_match(RRTree, DomainName, DomainName) ->
+    gb_trees:is_defined(DomainName, RRTree);
+is_qname_match(_RRTree, _DomainName, _OtherDomainName) ->
+    false.
 
-process_wildcard_match(Q, _RRTree, _D, _T) ->
-    Q. % TODO  
+process_qname_match(Q, RRTree, DomainName, Type) ->
+    case gb_trees:get(DomainName, RRTree) of
+    	[RR|[]] when RR#dns_rr.type=:=cname andalso Type=/=cname ->
+    	    resolve_cname(Q, RR);
+    	RRs ->
+    	    matching_rr_to_anlist(Q, RRs, Type)
+    end.
+
+resolve_cname(Q, RR) ->
+    % ...copy the CNAME RR into the answer section
+    % of the response, change QNAME to the canonical name in
+    % the CNAME RR, and go back to step 1.
+    [QD|[]] = Q#dns_rec.qdlist,
+    AnList = Q#dns_rec.anlist,
+    CName = RR#dns_rr.data,
+    Q1 = Q#dns_rec{
+        qdlist=[QD#dns_query{domain=CName}],
+        anlist=[RR|AnList]
+    },
+    Q2 = resolve(Q1),
+    Q2#dns_rec{qdlist=Q#dns_rec.qdlist}.
+
+matching_rr_to_anlist(Q, RRs, Type) ->
+    MatchingRRs = lists:filter(
+    	fun(RR) -> RR#dns_rr.type =:= Type end
+    	, RRs),
+    AnList = Q#dns_rec.anlist,	
+    Q#dns_rec{anlist=AnList++MatchingRRs}.
+
+is_wildcard_match(RRTree, DomainName) ->
+    WildCardName = re:replace(DomainName, ".*?\\.", "*.", [{return, list}]),
+    gb_trees:is_defined(WildCardName, RRTree) and 
+    not gb_trees:is_defined(DomainName, RRTree). 
+
+process_wildcard_match(Q, RRTree, DomainName, Type) ->
+    % If the "*" label does exist, match RRs at that node
+    % against QTYPE.  If any match, copy them into the answer
+    % section, but set the owner of the RR to be QNAME, and
+    % not the node with the "*" label.  
+    [QD|[]] = Q#dns_rec.qdlist,
+    WildCardName = re:replace(DomainName, ".*?\\.", "*.", [{return, list}]),
+    RRs = gb_trees:get(WildCardName, RRTree),
+    Q#dns_rec{anlist=lists:foldr(
+    	fun(RR, Acc) ->
+    		case RR#dns_rr.type =:= Type of
+    			false -> Acc;
+    			true -> [RR#dns_rr{domain=QD#dns_query.domain}|Acc]
+    		end
+    	end, Q#dns_rec.anlist, RRs)}.
 
 not_implemented_error(Q, Reason) ->
     error_logger:error_msg("Not implemented (~p) Query: ~p", [Reason, Q]),

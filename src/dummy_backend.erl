@@ -11,6 +11,8 @@ get_zone(Ctx) ->
   {ok,[
     #dns_rr{domain="www.abc.com", type=cname, data="www2.abc.com"},
     #dns_rr{domain="www2.abc.com", type=cname, data="abc.com"},
+    #dns_rr{domain="*.abc.com", type=a, data={100,2,3,4}},
+    #dns_rr{domain="test.abc.com", type=a, data={111,2,3,4}},
     #dns_rr{domain="abc.com", type=a, data={1,2,3,4}},
     #dns_rr{domain="abc.com", type=a, data={5,6,7,8}},
     #dns_rr{domain="sub.abc.com", type=ns, data="ns1.sub.abc.com"},
