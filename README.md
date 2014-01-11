@@ -3,11 +3,30 @@ erlang-dns
 
 Erlang/OTP DNS server
 
-Folks, don't use this yet. This is a first commit and will echo your DNS query back at best. You're welcome to follow of course to see a novice Erlanger craft and burn.
+EDNS is an authorative non recursive DNS server I am writing for my site
+http://www.domain-name-registration.co.za.
 
-I am planning to use the undocumented gen_dns module to handle most of the heavy lifting. In particular gen_dns:decode/? and gen_dns:encode/? should proof handy. 
+The idea is to have a simple DNS server that can be configured with 
+arbitrary Zones via simple Erlang modules. It's up to you whether the
+Zone is defined in some file or a DB for example. As long as it returns
+a zone as a list of resource records EDNS can serve it up.
 
-This project is will morph into something useful to use with my site domain-name-registration.co.za. Positive affirmations rock!
+Current Release
+===============
+v0.1-alpha
+
+Example
+=======
+Have a look at the end to end test scenario for an example of how to setup
+a zone provider module.
+
+To run the end to end test executed `make e2e`.
+
+TODO
+====
+* case insensitive lookup
+* sanity-check the zone provided by a callback module
+* use inet_dns ADT helper functions in the resolver rather than pattern matching.
 
 Notes
 =====
