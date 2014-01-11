@@ -22,6 +22,10 @@ a zone provider module.
 
 To run the end to end test executed `make e2e`.
 
+System Architecture
+===================
+Please see the wiki https://github.com/hcvst/erlang-dns/wiki/Architecture
+
 TODO
 ====
 * case insensitive lookup
