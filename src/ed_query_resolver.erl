@@ -117,7 +117,8 @@ match_records(Q, RRTree) ->
     DomainName = get_domain_name(Q),  
     NameTails = ed_utils:tails(string:tokens(DomainName, ".")),
     Names = lists:map(fun(X) -> string:join(X, ".") end, NameTails),
-    match_records(Q, RRTree, Names).
+    Q1 = match_records(Q, RRTree, Names),
+    enrich_additional_section(Q1, RRTree).
 
 match_records(Q, RRTree, []) ->
     non_existent_domain(Q, RRTree);
@@ -232,6 +233,34 @@ process_wildcard_match(Q, RRTree, DomainName, Type) ->
     			true -> [RR#dns_rr{domain=QD#dns_query.domain}|Acc]
     		end
     	end, Q#dns_rec.anlist, RRs)}.
+
+
+enrich_additional_section(Q, RRTree) ->
+    AnList = Q#dns_rec.anlist,
+    ArList = lists:foldr(
+    	fun(RR, Acc) -> 
+    		case RR#dns_rr.type of
+    			mx -> enrich_additional_section_mx(RRTree, RR, Acc);
+    			_  -> Acc
+    		end
+    	end, Q#dns_rec.arlist, AnList),
+    Q#dns_rec{arlist=ArList}.
+
+enrich_additional_section_mx(RRTree, MxRR, ArList) ->
+    {_Prio, DomainName} = MxRR#dns_rr.data,
+    case gb_trees:lookup(DomainName, RRTree) of
+    	none -> ArList;
+    	{value, RRs} ->
+    	    lists:foldr(
+    	    	fun(RR, Acc) ->
+    	    	    case RR#dns_rr.type of
+    	    	    	a -> [RR|Acc];
+    	    	    	_ -> Acc
+    	    	    end 
+    	    	end, ArList, RRs)
+    end.
+
+
 
 not_implemented_error(Q, Reason) ->
     error_logger:error_msg("Not implemented (~p) Query: ~p", [Reason, Q]),
