@@ -58,7 +58,7 @@ how to setup the included `simple_backend` zone provider module.
 
 Tests
 =====
-To run the end to end test executed `make e2e`.
+To run the end to end test execute `make e2e`.
 
 System Architecture
 ===================
