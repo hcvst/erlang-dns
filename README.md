@@ -25,6 +25,7 @@ To run the end to end test executed `make e2e`.
 System Architecture
 ===================
 Please see the wiki https://github.com/hcvst/erlang-dns/wiki/Architecture
+![erlang-dns supervision tree](http://stick.im/i/l/lVU.png)
 
 TODO
 ====
