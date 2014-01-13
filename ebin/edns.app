@@ -14,9 +14,7 @@
      ed_zone_data_server,
      ed_query_resolver,
      simple_backend,
-     ed_utils,
-     dummy_parked_backend,
-     ed_zone_validator
+     ed_utils
    ]},
    {registered, [ed_sup]},
    {applications, [kernel, stdlib]},
