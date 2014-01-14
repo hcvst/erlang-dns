@@ -57,6 +57,7 @@ handle_cast(stop, State) ->
 handle_info(timeout, #state{zone_provider={M,F,A}}=State) ->
   error_logger:info_msg("Reloading zone: ~p", [State#state.zone_name]),
   {ok, RRs} = M:F(A),
+  RRs1 = convert_records_to_lowercase(RRs),
   RRTree = lists:foldr(
     fun(RR, Tree) ->
       Domain = RR#dns_rr.domain,
@@ -66,7 +67,7 @@ handle_info(timeout, #state{zone_provider={M,F,A}}=State) ->
         true ->
           gb_trees:update(Domain, [RR|gb_trees:get(Domain, Tree)], Tree)
        end 
-    end, gb_trees:empty(), RRs),
+    end, gb_trees:empty(), RRs1),
    {noreply, State#state{rr_tree=RRTree}, 60000}; %% FIXME timeout
 handle_info(_Info, State) ->
    {noreply, State}.
@@ -77,3 +78,13 @@ terminate(_Reason, #state{zone_name=ZoneName}) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+%%%============================================================================
+%%% Internal
+%%%============================================================================
+
+convert_records_to_lowercase(RRs) ->
+  lists:map(fun domain_to_lowercase/1, RRs).
+
+domain_to_lowercase(#dns_rr{domain=Domain}=RR) ->
+  RR#dns_rr{domain=string:to_lower(Domain)}.
