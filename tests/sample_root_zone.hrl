@@ -51,41 +51,41 @@
         86400            %minimum of a day
         }
     },
-    ?NS1 = #dns_rr{domain="", type=ns, data="A.ISI.EDU"},
-    ?NS2 = #dns_rr{domain="", type=ns, data="C.ISI.EDU"},
-    ?NS3 = #dns_rr{domain="", type=ns, data="SRI-NIC.ARPA"},
+    ?NS1 = #dns_rr{domain="", type=ns, data="a.isi.edu"},
+    ?NS2 = #dns_rr{domain="", type=ns, data="c.isi.edu"},
+    ?NS3 = #dns_rr{domain="", type=ns, data="sri-nic.arpa"},
 
-    ?MilNS1 = #dns_rr{domain="MIL", type=ns, data="SRI-NIC.ARPA"},
-    ?MilNS2 = #dns_rr{domain="MIL", type=ns, data="A.ISI.EDU"},
+    ?MilNS1 = #dns_rr{domain="mil", type=ns, data="sri-nic.arpa"},
+    ?MilNS2 = #dns_rr{domain="mil", type=ns, data="a.isi.edu"},
 
-    ?EduNS1 = #dns_rr{domain="EDU", type=ns, data="SRI-NIC.ARPA"},
-    ?EduNS2 = #dns_rr{domain="EDU", type=ns, data="C.ISI.EDU"},
+    ?EduNS1 = #dns_rr{domain="edu", type=ns, data="sri-nic.arpa"},
+    ?EduNS2 = #dns_rr{domain="edu", type=ns, data="c.isi.edu"},
 
-    ?SriA1 = #dns_rr{domain="SRI-NIC.ARPA", type=a, ttl=86400, data={26,0,0,73}},
-    ?SriA2 = #dns_rr{domain="SRI-NIC.ARPA", type=a, ttl=86400, data={10,0,0,51}},
-    ?SriMx = #dns_rr{domain="SRI-NIC.ARPA", type=mx, data={0, "SRI-NIC.ARPA"}},
-    ?SriHi = #dns_rr{domain="SRI-NIC.ARPA", type=hinfo, data={
+    ?SriA1 = #dns_rr{domain="sri-nic.arpa", type=a, ttl=86400, data={26,0,0,73}},
+    ?SriA2 = #dns_rr{domain="sri-nic.arpa", type=a, ttl=86400, data={10,0,0,51}},
+    ?SriMx = #dns_rr{domain="sri-nic.arpa", type=mx, data={0, "sri-nic.arpa"}},
+    ?SriHi = #dns_rr{domain="sri-nic.arpa", type=hinfo, data={
         "DEC-2060", "TOPS20"}},
 
-    ?AccA1 = #dns_rr{domain="ACC.ARPA", type=a, data={26,6,0,65}},
-    ?AccHi = #dns_rr{domain="ACC.ARPA", type=hinfo, data={
+    ?AccA1 = #dns_rr{domain="acc.arpa", type=a, data={26,6,0,65}},
+    ?AccHi = #dns_rr{domain="acc.arpa", type=hinfo, data={
         "PDP-11/70", "UNIX"}},
-    ?AccMx = #dns_rr{domain="ACC.ARPA", type=mx, data={10, "ACC.ARPA"}},
+    ?AccMx = #dns_rr{domain="acc.arpa", type=mx, data={10, "acc.arpa"}},
 
-    ?UscCname = #dns_rr{domain="USC-ISIC.ARPA", type=cname, data="C.ISI.EDU"},
+    ?UscCname = #dns_rr{domain="usc-isic.arpa", type=cname, data="c.isi.edu"},
 
-    ?Ptr1 = #dns_rr{domain="73.0.0.26.IN-ADDR.ARPA", type=ptr, data=
-        "SRI-NIC.ARPA"},
-    ?Ptr2 = #dns_rr{domain="65.0.6.26.IN-ADDR.ARPA", type=ptr, data=
-        "ACC.ARPA"},
-    ?Ptr3 = #dns_rr{domain="51.0.0.10.IN-ADDR.ARPA", type=ptr, data=
-        "SRI-NIC.ARPA"},
-    ?Ptr4 = #dns_rr{domain="52.0.0.10.IN-ADDR.ARPA", type=ptr, data=
-        "C.ISI.EDU"},
-    ?Ptr5 = #dns_rr{domain="103.0.3.26.IN-ADDR.ARPA", type=ptr, data=
-        "A.ISI.EDU"},
+    ?Ptr1 = #dns_rr{domain="73.0.0.26.in-addr.arpa", type=ptr, data=
+        "sri-nic.arpa"},
+    ?Ptr2 = #dns_rr{domain="65.0.6.26.in-addr.arpa", type=ptr, data=
+        "acc.arpa"},
+    ?Ptr3 = #dns_rr{domain="51.0.0.10.in-addr.arpa", type=ptr, data=
+        "sri-nic.arpa"},
+    ?Ptr4 = #dns_rr{domain="52.0.0.10.in-addr.arpa", type=ptr, data=
+        "c.isi.edu"},
+    ?Ptr5 = #dns_rr{domain="103.0.3.26.in-addr.arpa", type=ptr, data=
+        "a.isi.edu"},
 
-    ?AIsiA1 = #dns_rr{domain="A.ISI.EDU", type=a, data={26,3,0,103}},
-    ?CIsiA1 = #dns_rr{domain="C.ISI.EDU", type=a, data={10,0,0,52}}
+    ?AIsiA1 = #dns_rr{domain="a.isi.edu", type=a, data={26,3,0,103}},
+    ?CIsiA1 = #dns_rr{domain="c.isi.edu", type=a, data={10,0,0,52}}
     ]
 ).

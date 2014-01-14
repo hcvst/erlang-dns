@@ -75,7 +75,6 @@ Please see the wiki https://github.com/hcvst/erlang-dns/wiki/Architecture
 
 TODO
 ====
-* case insensitive lookup
 * sanity-check the zone provided by a callback module
 * use inet_dns ADT helper functions in the resolver rather than pattern matching.
 

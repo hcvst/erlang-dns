@@ -125,7 +125,8 @@ match_records(Q, RRTree) ->
 match_records(Q, RRTree, []) ->
     non_existent_domain(Q, RRTree);
 match_records(Q, RRTree, [Name|Rest]) ->
-    [#dns_query{domain=D, type=T, class=_C}|[]] = Q#dns_rec.qdlist,
+    [#dns_query{domain=Domain, type=T, class=_C}|[]] = Q#dns_rec.qdlist,
+    D = string:to_lower(Domain),
     case is_referral_match(RRTree, Name) of
     	true ->  process_referral_match(Q, RRTree, Name);
     	false ->
@@ -299,7 +300,7 @@ is_cname_recursive_lookup(Q) ->
 
 get_domain_name(Q) ->
     [QD|[]] = Q#dns_rec.qdlist,
-    QD#dns_query.domain.
+    string:to_lower(QD#dns_query.domain).
 
 get_soa_rr(RRTree) ->
     RRs = lists:flatten(gb_trees:values(RRTree)),
