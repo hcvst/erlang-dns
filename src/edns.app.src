@@ -1,0 +1,12 @@
+{application, edns,
+  [{description, "A Erlang OTP DNS Server"},
+   {vsn, "0.1-alpha"},
+   {modules, []},
+   {registered, [ed_sup]},
+   {applications, [kernel, stdlib]},
+   {mod, {ed_app, []}},
+   {env, [
+     {port, 1051}
+   ]}
+  ]
+}.
