@@ -43,7 +43,6 @@ init([{ZoneName, ZoneProvider}]) ->
     {error, Reason} -> {stop, Reason}
   end.
 
-
 handle_call(get_zone, _From, State) ->
   {reply, {ok, State#state.rr_tree}, State};
 handle_call(_Request, _From, State) ->
