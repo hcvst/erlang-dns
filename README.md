@@ -80,4 +80,5 @@ TODO
 
 Notes
 =====
-Section 4.3.2 Algorithm in http://tools.ietf.org/html/rfc1034
+* Section 4.3.2 Algorithm in http://tools.ietf.org/html/rfc1034
+* https://erlangcentral.org/wiki/index.php/Building_a_Non-blocking_TCP_server_using_OTP_principles
