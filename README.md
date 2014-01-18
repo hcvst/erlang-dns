@@ -79,7 +79,7 @@ result with:
 
 ```erlang
 Eshell V5.10.2  (abort with ^G)
-1> ends:register_zone_provider("bot.co.za", {simple_backend, get_zone,[
+1> ends:register_zone_provider("bot.co.za", {simple_backend, get_zone, [
         #dns_rr{domain="bot.co.za", type=soa, data={   
             "ns1.bot.co.za",                         
             "hc.vst.io",              
