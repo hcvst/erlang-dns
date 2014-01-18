@@ -58,7 +58,7 @@ edns:register_zone_provider("bot.co.za", {my_zone_provider, get_zone, []}).
 
 If you change and recompile `my_zone_provider` you can flush the zone with
 
-```
+```erlang
 edns:flush("bot.co.za").
 ```
 
@@ -66,6 +66,36 @@ without restarting the server.
 
 Also, please have a look at the-end-to end test scenario for an example of 
 how to setup the included `src/simple_backend.erl` zone provider module.
+
+The `simple_backend` consists essentially of only the following two lines:
+
+```erlang
+get_zone(Zone) ->
+    {ok, Zone}.
+```
+
+Instead of writing the `my_zone_provider` above, you could have achieved the same
+result with:
+
+```erlang
+Eshell V5.10.2  (abort with ^G)
+1> ends:register_zone_provider("bot.co.za", {simple_backend, get_zone,[
+        #dns_rr{domain="bot.co.za", type=soa, data={   
+            "ns1.bot.co.za",                         
+            "hc.vst.io",              
+            870611,          %serial
+            1800,            %refresh every 30 min 
+            300,             %retry every 5 min
+            604800,          %expire after a week
+            86400            %minimum of a day
+            }
+        },
+        #dns_rr{domain="bot.co.za", type=ns, data="ns1.bot.co.za"},
+        #dns_rr{domain="bot.co.za", type=ns, data="ns2.bot.co.za"},
+        #dns_rr{domain="www.bot.co.za", type=cname, data="bot.co.za"},
+        #dns_rr{domain="bot.co.za", type=a, data={127,0,0,1}}
+    ]}).
+```
 
 Extensions
 ==========
@@ -81,7 +111,7 @@ implement a custom resolver to augment or swap out `ed_query_resolver` entirely.
 
 `edns.app.src` specifies what resolver(s) to use:
 
-```
+```erlang
 {env, [
      {port, 1051},
      {resolvers, [ed_query_resolver, simple_stats_resolver]}
