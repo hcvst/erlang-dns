@@ -107,7 +107,6 @@ find_zone(Q) ->
     DomainName = get_domain_name(Q),
     case ed_zone_registry_server:find_nearest_zone(DomainName) of
     	{ok, Zone} -> load_zone(Q, Zone);
-        {custom_handler, {M,F,A}} -> M:F(Q,A);
     	{error, _} -> non_existent_zone(Q)
     end.
 
