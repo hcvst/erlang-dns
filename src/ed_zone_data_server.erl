@@ -67,7 +67,8 @@ handle_info(timeout, #state{zone_provider={M,F,A}}=State) ->
           gb_trees:update(Domain, [RR|gb_trees:get(Domain, Tree)], Tree)
        end 
     end, gb_trees:empty(), RRs1),
-   {noreply, State#state{rr_tree=RRTree}, 60000}; %% FIXME timeout
+  {ok, RefreshInterval} = get_zone_expiry(RRs1),
+   {noreply, State#state{rr_tree=RRTree}, RefreshInterval}; 
 handle_info(_Info, State) ->
    {noreply, State}.
 
@@ -87,3 +88,21 @@ convert_records_to_lowercase(RRs) ->
 
 domain_to_lowercase(#dns_rr{domain=Domain}=RR) ->
   RR#dns_rr{domain=string:to_lower(Domain)}.
+
+get_zone_expiry(RRs) ->
+  case get_zone_expiry_from_soa(RRs) of
+    undefined -> soa_missing;
+    Expiry -> {ok, Expiry * 1000} % convert to milliseconds
+  end.
+
+get_zone_expiry_from_soa(RRs) ->
+  lists:foldr(
+    fun(RR, Acc) ->
+      case RR#dns_rr.type of
+        soa -> 
+          {_Host, _Contact, _Serial, Refresh, _Retry, _Expiry, _Min} = 
+            RR#dns_rr.data,
+          Refresh;
+        _ -> Acc
+      end
+    end, undefined, RRs).

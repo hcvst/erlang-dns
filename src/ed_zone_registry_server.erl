@@ -77,7 +77,7 @@ handle_call({find_nearest_zone, DomainName}, _From, State) ->
   	[H|_] -> {ok, gb_trees:get(H, State)}
   end,
   {reply, Zone, State};
-handle_call(Request, From, State) ->
+handle_call(_Request, _From, State) ->
   error_logger:error_msg("Unexpected request"),
   {noreply, State}.
 
