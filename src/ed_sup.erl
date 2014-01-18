@@ -49,6 +49,12 @@ init([]) ->
       permanent, 2000, supervisor, 
       [ed_zone_sup]
   },
-  Children = [UdpServer, UdpHandlerSup, ZoneSup],
+  PoolSup = {
+      ed_udp_pool_sup, 
+      {ed_udp_pool_sup, start_link, []},
+      permanent, 2000, supervisor, 
+      [ed_udp_pool_sup]
+  },
+  Children = [UdpServer, UdpHandlerSup, ZoneSup, PoolSup],
   RestartStrategy = {one_for_one, 3600, 4},
   {ok, {RestartStrategy, Children}}.

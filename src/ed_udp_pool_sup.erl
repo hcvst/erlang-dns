@@ -4,12 +4,12 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_udp_handler_sup).
+-module(ed_udp_pool_sup).
 
 -behaviour(supervisor).
 
 %% API
--export([start_link/0, handle/1]).
+-export([start_link/0, start_child/0]).
 
 %% behaviour callbacks
 -export([init/1]).
@@ -30,18 +30,18 @@ start_link() ->
 %%-----------------------------------------------------------------------------
 %% @doc Starts a child worker to perforom a DNS lookup 
 %%-----------------------------------------------------------------------------
-handle(UdpMsg) ->
-  supervisor:start_child(?SERVER, [UdpMsg]).
+start_child() ->
+  error_logger:info_msg("Start child called"),
+  supervisor:start_child(?SERVER, []).
 
 
 %%%============================================================================
 %%% behaviour callbacks
 %%%============================================================================
 init([]) ->
-  
-  error_logger:info_msg("Loading child spec for ed_udp_handler_sup"),
-  Server = {ed_udp_handler_server, {ed_udp_handler_server, start_link, []},
-    temporary, 2000, worker, [ed_udp_handler_server]},
+  error_logger:info_msg("Loading child spec"),
+  Server = {undefined, {ed_udp_pool_server, start_link, []},
+    temporary, 2000, worker, [ed_udp_pool_server]},
   Children = [Server],
   RestartStrategy = {simple_one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.

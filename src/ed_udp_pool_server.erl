@@ -4,21 +4,21 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_udp_server).
+-module(ed_udp_pool_server).
 
 -behaviour(gen_server).
 
 %% API
--export([start_link/0, start_link/1, stop/0]).
+-export([start_link/0, stop/0]).
 
 %% behaviour callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
   terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
--define(NUM_HANDLERS, 100).
+-define(NUM_HANDLERS, 5).
 
--record(state, {socket, handlers=[]}).
+-record(state, {sock, handlers=[]}).
 
 %%%============================================================================
 %%% API
@@ -30,15 +30,10 @@
 %% @spec start_link(UdpPort::integer()) -> {ok, Pid::pid()}
 %% @end
 %%-----------------------------------------------------------------------------
-start_link(UdpPort) ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [UdpPort], []).
-
-%% @doc Start the server on default port
-%% @spec start_link() -> {ok, Pid::pid()}
-%% @end
 start_link() ->
-  {ok, Port} = application:get_env(edns, port),
-  start_link(Port).
+  error_logger:info_msg("In API start_link"),
+  gen_server:start_link(?MODULE, [], []).
+
 
 %%-----------------------------------------------------------------------------
 %% @doc Stop the server
@@ -54,31 +49,29 @@ stop() ->
 %%%============================================================================
 
 
-init([UdpPort]) ->
-  {ok, Socket} = gen_udp:open(UdpPort, [{active, false}, binary]),
-  {ok, #state{socket=Socket}, 100}.
+init([]) ->
+  %%error_logger:info_msg("Child starting!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"),
+  {ok, #state{}}.
 
+handle_call({take_socket, Socket, Handlers}, _From, State) ->
+  %%error_logger:info_msg("Asked to take socket"),
+  inet:setopts(Socket, [{active, once}]),
+  {reply, ok, #state{sock=Socket, handlers=Handlers}};
 handle_call(_Request, _From, State) ->
   {noreply, State}.
 
 handle_cast(stop, State) ->
   {stop, normal, State}.
 
-handle_info(timeout, #state{socket=Socket}=State) ->
-   error_logger:info_msg("T I M E O U T"),
-   %ed_udp_pool_sup:start_child(),
-   C = fun(_X) -> 
-        {ok, C} = ed_udp_pool_sup:start_child(),
-        C
-      end,
-   [H1|Hs] = Handlers = [C(X) || X <- lists:seq(1, ?NUM_HANDLERS, 1)],
-   io:format("H1 is ~p", [H1]),
-   gen_udp:controlling_process(Socket, H1),
-   gen_server:call(H1, {take_socket, Socket, Hs++[H1]}),
+handle_info({udp, Socket, IP, Port, ReqBin}, #state{sock=Socket1, handlers=[H1|Hs]}=State) ->
+   %%error_logger:info_msg("Got udp ~p !!!!!!!!!!!!!!!!!!!!!!!!!!!", [self()]),
+   gen_udp:controlling_process(Socket1, H1),
+   gen_server:call(H1, {take_socket, Socket1, Hs++[H1]}),
+   gen_udp:send(Socket, IP, Port, ReqBin),
    {noreply, State}.
 
-terminate(_Reason, #state{socket=Socket}) ->
-  gen_udp:close(Socket),
+terminate(_Reason, #state{sock = Sock}) ->
+  gen_udp:close(Sock),
   ok.
 
 code_change(_OldVsn, State, _Extra) ->

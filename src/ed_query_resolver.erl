@@ -104,11 +104,12 @@ resolve(Q) ->
     end.
 
 find_zone(Q) -> 
-    DomainName = get_domain_name(Q),
-    case ed_zone_registry_server:find_nearest_zone(DomainName) of
-    	{ok, Zone} -> load_zone(Q, Zone);
-    	{error, _} -> non_existent_zone(Q)
-    end.
+    %%DomainName = get_domain_name(Q),
+    %%case ed_zone_registry_server:find_nearest_zone(DomainName) of
+    %%	{ok, Zone} -> load_zone(Q, Zone);
+    %%	{error, _} -> non_existent_zone(Q)
+    %%end.
+    Q.
 
 load_zone(Q, Zone) ->
     Q1 = set_aa_header_flag(Q),
@@ -273,7 +274,7 @@ not_implemented_error(Q, Reason) ->
     set_response_code(Q, ?NOTIMP).
 
 non_existent_zone(Q) ->
-    error_logger:warning_msg("Zone not found for Query: ~p", [Q]),
+    %%error_logger:warning_msg("Zone not found for Query: ~p", [Q]),
     case is_cname_recursive_lookup(Q) of
     	true  -> set_response_code(Q, ?NOERROR);
     	false -> set_response_code(Q, ?REFUSED)
@@ -282,7 +283,7 @@ non_existent_zone(Q) ->
 non_existent_domain(Q, RRTree) ->
     SoaRR = get_soa_rr(RRTree),
     Q1 = Q#dns_rec{nslist=[SoaRR|Q#dns_rec.nslist]},
-    error_logger:info_msg("NXDOMAIN response: ~p", [Q1]),
+    %%error_logger:info_msg("NXDOMAIN response: ~p", [Q1]),
     set_response_code(Q1, ?NXDOMAIN).
 
 %%%============================================================================
