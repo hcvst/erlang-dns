@@ -4,7 +4,7 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
--module(ed_sup).
+-module(ed_extension_sup).
 
 -behaviour(supervisor).
 
@@ -15,6 +15,10 @@
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
+
+-define(EXTENSIONS_PATH, "priv/extensions/*/*.erl").
+
+-define(CHILD(M), {M, {M, start_link, []}, permanent, 5000, worker, [M]}).
 
 %%%============================================================================
 %%% API
@@ -31,30 +35,29 @@ start_link() ->
 %%% behaviour callbacks
 %%%============================================================================
 init([]) ->
-  UdpServer = {
-      ed_udp_server, 
-      {ed_udp_server, start_link, []},
-      permanent, 2000, worker, 
-      [ed_udp_server]
-  },
-  UdpHandlerSup = {
-      ed_udp_handler_sup, 
-      {ed_udp_handler_sup, start_link, []},
-      permanent, 2000, supervisor, 
-      [ed_udp_handler_sup]
-  },
-  ZoneSup = {
-      ed_zone_sup, 
-      {ed_zone_sup, start_link, []},
-      permanent, 2000, supervisor, 
-      [ed_zone_sup]
-  },
-  ExtensionSup = {
-      ed_extension_sup, 
-      {ed_extension_sup, start_link, []},
-      permanent, 2000, supervisor, 
-      [ed_extension_sup]
-  },
-  Children = [UdpServer, UdpHandlerSup, ZoneSup, ExtensionSup],
+  Children = find_extensions(?EXTENSIONS_PATH),
   RestartStrategy = {one_for_one, 3600, 4},
   {ok, {RestartStrategy, Children}}.
+
+find_extensions(Path) ->
+  FilePaths = filelib:wildcard(Path),
+  FileNames = lists:map(fun filename:basename/1, FilePaths),
+  Modules = lists:map(
+  	fun(F) ->
+  		F1 = re:replace(F, ".erl", "", [{return, list}]),
+  		list_to_atom(F1)
+  	end, FileNames),
+  OtpModules = lists:filter(
+  	fun(M) ->
+  		Attrs = M:module_info(attributes),
+  		case proplists:get_value(behaviour, Attrs) of
+  			[gen_server] -> true;
+  			[supervisor] -> true;
+  			_ -> false
+  		end
+  	end, Modules),
+  case OtpModules of
+  	[] -> nop;
+  	_ -> error_logger:info_msg("Found extensions: ~p", [OtpModules])
+  end,
+  [?CHILD(M) || M <- OtpModules].

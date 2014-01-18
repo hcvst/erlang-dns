@@ -64,8 +64,15 @@ without restarting the server.
 Also, please have a look at the-end-to end test scenario for an example of 
 how to setup the included `src/simple_backend.erl` zone provider module.
 
+Extensions
+==========
+Extensions live in the `priv/extensions` folder. Have a look at the `simple_stats` 
+extension that counts the number of DNS requests.
+
+Extensions can consist of custom resolvers and OTP servers/supervisors.
+
 Custom Resolvers
-================
+----------------
 By default, queries are processed by `ed_query_resolver`, however you can 
 implement a custom resolver to augment or swap out `ed_query_resolver` entirely.
 
@@ -74,15 +81,24 @@ implement a custom resolver to augment or swap out `ed_query_resolver` entirely.
 ```
 {env, [
      {port, 1051},
-     {resolvers, [ed_query_resolver]}
+     {resolvers, [ed_query_resolver, simple_stats_resolver]}
    ]}
 ```
 
 `ed_udp_handler_server` `foldl`s over all resolvers to arrive at a DNS query
 response.
 
-An example usecase of a custom resolver is one that looks up the synopsis of
+The `simple_stats_resolver` is a passthrough resolver that does not modify the repsonse.
+All it does is to notify `simple_stats_server` that another query has arrived.
+
+Another example usecase of a custom resolver is one that looks up the synopsis of
 a Wikipedia article and returns it in a TXT record.
+
+Custom OTP servers/supervisors
+------------------------------
+Modules in the `extensions/...` directory that implement either the `gen_server` or
+`supervisor` behaviour are automatically started and supervised by `ed_extension_sup`.
+This is useful if your custom resolvers need to maintain state.
 
 Tests
 =====
