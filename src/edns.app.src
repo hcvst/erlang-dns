@@ -7,7 +7,7 @@
    {mod, {ed_app, []}},
    {env, [
      {port, 1051},
-     {resolvers, [ed_query_resolver, simple_stats_resolver]}
+     {resolvers, [ed_query_resolver]}
    ]}
   ]
 }.
