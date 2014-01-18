@@ -26,6 +26,7 @@ main(_) ->
     ok = test_rfc1034_6_2_6(),
     ok = test_rfc1034_6_2_7(),
     ok = test_rfc1034_6_2_8(),
+    {ok, 8} = simple_stats:get(),
     log("ALL TESTS PASSED"),
     ok.
 
