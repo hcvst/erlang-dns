@@ -3,15 +3,15 @@ erlang-dns
 
 Erlang/OTP DNS server
 
-EDNS is an authorative non recursive DNS server I am writing for my site
+erlang-dns is an authorative non recursive DNS server I am writing for my site
 http://www.domain-name-registration.co.za.
 
 The idea is to have a simple DNS server that can be configured with 
 arbitrary Zones via simple Erlang modules. It's up to you whether the
 Zone is defined in some file or a DB for example. As long as the module returns
-a zone as a list of resource records EDNS can serve it up.
+a zone as a list of resource records erlang-dns can serve it up.
 
-In addition, EDNS supports custom *extensions* to enhance or entirely change the 
+In addition, erlang-dns supports custom *extensions* to enhance or entirely change the 
 server's behaviour.
 
 Releases
