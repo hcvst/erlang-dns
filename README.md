@@ -64,6 +64,26 @@ without restarting the server.
 Also, please have a look at the-end-to end test scenario for an example of 
 how to setup the included `src/simple_backend.erl` zone provider module.
 
+Custom Resolvers
+================
+By default, queries are processed by `ed_query_resolver`, however you can 
+implement a custom resolver to augment or swap out `ed_query_resolver` entirely.
+
+`edns.app.src` specifies what resolver(s) to use:
+
+```
+{env, [
+     {port, 1051},
+     {resolvers, [ed_query_resolver]}
+   ]}
+```
+
+`ed_udp_handler_server` `foldl`s over all resolvers to arrive at a DNS query
+response.
+
+An example usecase of a custom resolver is one that looks up the synopsis of
+a Wikipedia article and returns it in a TXT record.
+
 Tests
 =====
 To run the end to end test execute `make e2e`.

@@ -9,4 +9,4 @@
               {registered,[ed_sup]},
               {applications,[kernel,stdlib]},
               {mod,{ed_app,[]}},
-              {env,[{port,1051}]}]}.
+              {env,[{port,1051},{resolvers,[ed_query_resolver]}]}]}.

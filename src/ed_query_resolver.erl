@@ -107,6 +107,7 @@ find_zone(Q) ->
     DomainName = get_domain_name(Q),
     case ed_zone_registry_server:find_nearest_zone(DomainName) of
     	{ok, Zone} -> load_zone(Q, Zone);
+        {custom_handler, {M,F,A}} -> M:F(Q,A);
     	{error, _} -> non_existent_zone(Q)
     end.
 
@@ -252,7 +253,7 @@ enrich_additional_section(Q, RRTree) ->
 
 enrich_additional_section_mx(_RRTree, _MxRR, ArList, #dns_query{type=any}) ->
     ArList;  %% don't enrich for ANY queries
-enrich_additional_section_mx(RRTree, MxRR, ArList, QD) ->
+enrich_additional_section_mx(RRTree, MxRR, ArList, _QD) ->
     {_Prio, DomainName} = MxRR#dns_rr.data,
     case gb_trees:lookup(DomainName, RRTree) of
     	none -> ArList;
