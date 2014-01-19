@@ -6,8 +6,12 @@
    {applications, [kernel, stdlib]},
    {mod, {ed_app, []}},
    {env, [
-     {port, 1051},
-     {resolvers, [ed_query_resolver]}
+     {udp_port, 1053},
+     {tcp_port, 1053},
+     {resolvers, [ed_query_resolver]},
+     {master_mode, false},
+     {slave_mode, false},
+     {supermasters, []}
    ]}
   ]
 }.

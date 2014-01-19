@@ -8,7 +8,7 @@
 
 -include("sample_root_zone.hrl").
 
--define(DNS_SERVERS, [{{127,0,0,1}, 1051}]).
+-define(DNS_SERVERS, [{{127,0,0,1}, 1053}]).
 
 -define(AUTHORATIVE_ANSWER, true).
 -define(NOT_AUTHORATIVE_ANSWER, false).

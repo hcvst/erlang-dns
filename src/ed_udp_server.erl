@@ -36,7 +36,7 @@ start_link(UdpPort) ->
 %% @spec start_link() -> {ok, Pid::pid()}
 %% @end
 start_link() ->
-  {ok, Port} = application:get_env(edns, port),
+  {ok, Port} = application:get_env(edns, udp_port),
   start_link(Port).
 
 %%-----------------------------------------------------------------------------
