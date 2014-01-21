@@ -37,6 +37,12 @@ init([]) ->
       permanent, 2000, worker, 
       [ed_udp_server]
   },
+  TcpServer = {
+      ed_tcp_server, 
+      {ed_tcp_server, start_link, []},
+      permanent, 2000, worker, 
+      [ed_tcp_server]
+  },
   UdpHandlerSup = {
       ed_udp_handler_sup, 
       {ed_udp_handler_sup, start_link, []},
@@ -55,6 +61,6 @@ init([]) ->
       permanent, 2000, supervisor, 
       [ed_extension_sup]
   },
-  Children = [UdpServer, UdpHandlerSup, ZoneSup, ExtensionSup],
+  Children = [UdpServer, TcpServer, UdpHandlerSup, ZoneSup, ExtensionSup],
   RestartStrategy = {one_for_one, 3600, 4},
   {ok, {RestartStrategy, Children}}.

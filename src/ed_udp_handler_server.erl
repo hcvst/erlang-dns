@@ -34,6 +34,7 @@ init([Parent, Packet]) ->
 %%%============================================================================
 
 answer_query({udp, Socket, IP, Port, ReqBin}) ->
+  io:format("UDP ReqBin: ~p", [ReqBin]),
   {ok, Query} = inet_dns:decode(ReqBin),
   {ok, Resolvers} = application:get_env(edns, resolvers),
   Resp = lists:foldl(
@@ -41,4 +42,17 @@ answer_query({udp, Socket, IP, Port, ReqBin}) ->
   	  R:resolve(Acc) 
   	end, Query, Resolvers),
   RespBin = inet_dns:encode(Resp),
-  gen_udp:send(Socket, IP, Port, RespBin).
+  gen_udp:send(Socket, IP, Port, RespBin);
+answer_query({tcp, Socket, ReqBin}) ->
+  io:format("TCP ReqBin: ~p", [ReqBin]),
+  {ok, Query} = inet_dns:decode(ReqBin),
+  {ok, Resolvers} = application:get_env(edns, resolvers),
+  Resp = lists:foldl(
+    fun(R, Acc) ->
+      R:resolve(Acc) 
+    end, Query, Resolvers),
+  RespBin = inet_dns:encode(Resp),
+  gen_tcp:send(Socket, RespBin);
+answer_query(Other) ->
+  io:format("Other: ~p", [Other]), 
+  ok.

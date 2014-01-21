@@ -15,6 +15,7 @@
 
 main(_) ->
     code:add_path("ebin"),
+    application:start(sasl),
     edns:start(),
     edns:register_zone_provider("", {simple_backend, get_zone, 
         ?SAMPLE_ROOT_ZONE}),
@@ -26,8 +27,9 @@ main(_) ->
     ok = test_rfc1034_6_2_6(),
     ok = test_rfc1034_6_2_7(),
     ok = test_rfc1034_6_2_8(),
-    {ok, 8} = simple_stats:get(),
+    %{ok, 8} = simple_stats:get(),
     log("ALL TESTS PASSED"),
+    timer:sleep(10000000),
     ok.
 
 test_rfc1034_6_2_1() -> %% http://tools.ietf.org/html/rfc1034#section-6.2.1
