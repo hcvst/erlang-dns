@@ -4,6 +4,8 @@
 %%% @end
 %%%----------------------------------------------------------------------------
 
+%%% Just for testing TCP server. 
+
 -module(ed_tcp_server).
 
 -behaviour(gen_server).
