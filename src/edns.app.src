@@ -8,7 +8,7 @@
    {env, [
      {udp_port, 1053},
      {tcp_port, 1053},
-     {resolvers, [ed_query_resolver]},
+     {resolvers, [ed_query_resolver, simple_stats_resolver]},
      {master_mode, false},
      {slave_mode, false},
      {supermasters, []}
