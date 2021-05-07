@@ -18,6 +18,13 @@ Releases
 ========
 * 2014-01-11 `v0.1-alpha` - First version that conforms to RFC1034 examples
 
+Installation
+============
+On Ubuntu please install Erlang base and source with `sudo apt install erlang-base erlang-src`.
+The sources are required since this server depends on `kernel/src/inet_dns.hrl`.
+
+Run the end to end tests with `make e2e` to confirm that everything works. 
+
 Example
 =======
 
