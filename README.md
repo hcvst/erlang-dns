@@ -86,7 +86,7 @@ result with:
 
 ```erlang
 Eshell V5.10.2  (abort with ^G)
-1> ends:register_zone_provider("bot.co.za", {simple_backend, get_zone, [
+1> edns:register_zone_provider("bot.co.za", {simple_backend, get_zone, [
         #dns_rr{domain="bot.co.za", type=soa, data={   
             "ns1.bot.co.za",                         
             "hc.vst.io",              
@@ -104,8 +104,8 @@ Eshell V5.10.2  (abort with ^G)
     ]}).
 ```
 
-The example above requires the record defintion for `#dns_rr` to be loaded
-which can be done with `rr("/usr/lib/erlang/lib/kernel-6.5.1/src/inet_dns.hrl").`.
+The example above requires the record defintion for `#dns_rr` to be loaded.
+This can be done with `rr("/usr/lib/erlang/lib/kernel-6.5.1/src/inet_dns.hrl").`.
 
 Port
 ====
