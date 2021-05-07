@@ -104,6 +104,15 @@ Eshell V5.10.2  (abort with ^G)
     ]}).
 ```
 
+The example above requires the record defintion for `#dns_rr` to be loaded
+which can be done with `rr("/usr/lib/erlang/lib/kernel-6.5.1/src/inet_dns.hrl").`.
+
+Port
+====
+Note that the server listens by default on port 1053. You may wish to formward 53 to it using socat.
+
+`sudo socat UDP4-RECVFROM:53,fork UDP4-SENDTO:localhost:1053`
+
 Extensions
 ==========
 Extensions live in the `priv/extensions` folder. Have a look at the `simple_stats` 
