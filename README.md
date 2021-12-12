@@ -109,7 +109,7 @@ This can be done with `rr("/usr/lib/erlang/lib/kernel-6.5.1/src/inet_dns.hrl").`
 
 Port
 ====
-Note that the server listens by default on port 1053. You may wish to formward 53 to it using socat.
+Note that the server listens by default on port 1053. You may wish to forward 53 to it using socat.
 
 `sudo socat UDP4-RECVFROM:53,fork UDP4-SENDTO:localhost:1053`
 
