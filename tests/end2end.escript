@@ -14,7 +14,7 @@
 -define(NOT_AUTHORATIVE_ANSWER, false).
 
 main(_) ->
-    code:add_path("ebin"),
+    code:add_path("_build/default/lib/edns/ebin"),
     edns:start(),
     edns:register_zone_provider("", {simple_backend, get_zone, 
         ?SAMPLE_ROOT_ZONE}),
