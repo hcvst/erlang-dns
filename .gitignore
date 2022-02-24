@@ -4,3 +4,4 @@ deps
 *.beam
 *.plt
 *.crash
+_build
