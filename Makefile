@@ -1,4 +1,4 @@
-REBAR=`which rebar` || ./rebar
+REBAR=`which rebar3` || ./rebar3
 END2END=./tests/end2end.escript
 all: deps compile
 deps:
